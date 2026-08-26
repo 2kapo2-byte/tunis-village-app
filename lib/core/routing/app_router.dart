@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -29,16 +30,12 @@ final appRouter = GoRouter(
   ],
 );
 
-class GoRouterRefreshStream extends StreamRouterRefreshListenable<AuthState> {
-  GoRouterRefreshStream(super.stream);
-}
-
-class StreamRouterRefreshListenable<T> extends GoRouterRefreshStreamBase {
-  StreamRouterRefreshListenable(Stream<T> stream) {
-    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<AuthState> stream) {
+    _subscription = stream.listen((_) => notifyListeners());
   }
 
-  late final StreamSubscription<T> _subscription;
+  late final StreamSubscription<AuthState> _subscription;
 
   @override
   void dispose() {
