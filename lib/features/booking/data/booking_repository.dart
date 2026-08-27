@@ -28,6 +28,40 @@ class BookingRepository {
     return BookingResult.fromRpc(data);
   }
 
+  /// Creates a booking on behalf of a guest through the server-authoritative
+  /// partner RPC. The authenticated user is resolved as marketer_id by the
+  /// database; the client cannot choose attribution or commission values.
+  Future<BookingResult> createPartnerBooking({
+    required String unitId,
+    required String propertyId,
+    required DateTime checkIn,
+    required DateTime checkOut,
+    required GuestComposition guests,
+    required String guestFullName,
+    required String guestPhone,
+    String? guestEmail,
+    String? paymentMethod,
+    String? customerNotes,
+  }) async {
+    final data = await _client.rpc('create_partner_booking', params: {
+      'p_params': {
+        'unit_id': unitId,
+        'property_id': propertyId,
+        'check_in': _date(checkIn),
+        'check_out': _date(checkOut),
+        'adults': guests.adults,
+        'children_count': guests.childrenCount,
+        'child_ages': guests.childAges.map((age) => {'age': age}).toList(),
+        'guest_full_name': guestFullName.trim(),
+        'guest_phone': guestPhone.trim(),
+        'guest_email': guestEmail?.trim(),
+        'payment_method': paymentMethod,
+        'customer_notes': customerNotes,
+      },
+    });
+    return BookingResult.fromRpc(data);
+  }
+
   Future<List<Booking>> myBookings() async {
     final user = _client.auth.currentUser;
     if (user == null) return const [];
@@ -38,4 +72,7 @@ class BookingRepository {
         .order('created_at', ascending: false);
     return rows.map((row) => Booking.fromMap(row)).toList(growable: false);
   }
+
+  static String _date(DateTime value) =>
+      '${value.year.toString().padLeft(4, '0')}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}';
 }
