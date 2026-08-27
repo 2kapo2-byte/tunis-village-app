@@ -17,6 +17,7 @@ import '../../features/booking/data/booking_repository.dart';
 import '../../features/booking/domain/booking_result.dart';
 import '../../features/booking/domain/create_booking_request.dart';
 import '../../features/booking/presentation/customer_booking_review_screen.dart';
+import '../../features/booking/presentation/partner_booking_details_screen.dart';
 import '../../features/booking/presentation/booking_confirmation_screen.dart';
 import '../../features/booking/presentation/my_bookings_screen.dart';
 
@@ -51,6 +52,11 @@ final appRouter = GoRouter(
       final property = args['property']; final query = args['query'];
       if (property is! PropertySummary || query is! SearchQuery) return const SearchScreen();
       return PropertyDetailsScreen(property: property, query: query);
+    }),
+    GoRoute(path: '/partner-booking-details', builder: (context, state) {
+      final request = state.extra;
+      if (request is! CreateBookingRequest || !request.partnerMode) return const SearchScreen();
+      return PartnerBookingDetailsScreen(request: request);
     }),
     GoRoute(path: '/booking-review', builder: (context, state) {
       final request = state.extra;
