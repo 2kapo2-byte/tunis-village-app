@@ -9,17 +9,16 @@ import '../../features/auth/presentation/register_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/search/domain/search_query.dart';
 import '../../features/search/presentation/search_screen.dart';
-import '../../features/properties/data/property_repository.dart';
 import '../../features/properties/domain/property_summary.dart';
 import '../../features/properties/presentation/properties_results_screen.dart';
 import '../../features/properties/presentation/property_details_screen.dart';
+import '../../features/availability/data/availability_repository.dart';
 import '../../features/booking/data/booking_repository.dart';
 import '../../features/booking/domain/booking_result.dart';
 import '../../features/booking/domain/create_booking_request.dart';
 import '../../features/booking/presentation/customer_booking_review_screen.dart';
 import '../../features/booking/presentation/booking_confirmation_screen.dart';
 import '../../features/booking/presentation/my_bookings_screen.dart';
-import '../../features/partner/presentation/partner_customers_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -39,11 +38,12 @@ final appRouter = GoRouter(
     GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
     GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
     GoRoute(path: '/search', builder: (context, state) => const SearchScreen()),
-    GoRoute(path: '/partner-customers', builder: (context, state) => const PartnerCustomersScreen()),
+    GoRoute(path: '/partner-search', builder: (context, state) => const SearchScreen(partnerMode: true)),
     GoRoute(path: '/properties', builder: (context, state) {
-      final query = state.extra;
+      final extra = state.extra;
+      final query = extra is SearchQuery ? extra : extra is Map ? extra['query'] : null;
       if (query is! SearchQuery) return const SearchScreen();
-      return PropertiesResultsScreen(query: query, repository: PropertyRepository(Supabase.instance.client));
+      return PropertiesResultsScreen(query: query, repository: AvailabilityRepository(Supabase.instance.client));
     }),
     GoRoute(path: '/property-details', builder: (context, state) {
       final args = state.extra;
