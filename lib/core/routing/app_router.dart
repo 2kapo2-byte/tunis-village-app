@@ -46,8 +46,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/property-details', builder: (context, state) {
       final args = state.extra;
       if (args is! Map) return const SearchScreen();
-      final property = args['property'];
-      final query = args['query'];
+      final property = args['property']; final query = args['query'];
       if (property is! PropertySummary || query is! SearchQuery) return const SearchScreen();
       return PropertyDetailsScreen(property: property, query: query);
     }),
@@ -61,17 +60,12 @@ final appRouter = GoRouter(
       if (result is! BookingResult) return const SearchScreen();
       return BookingConfirmationScreen(result: result, onViewBookings: () => context.go('/my-bookings'), onGoHome: () => context.go('/'));
     }),
-    GoRoute(path: '/my-bookings', builder: (context, state) {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) return const LoginScreen();
-      return MyBookingsScreen(repository: BookingRepository(Supabase.instance.client), customerId: user.id);
-    }),
+    GoRoute(path: '/my-bookings', builder: (context, state) => MyBookingsScreen(repository: BookingRepository(Supabase.instance.client))),
   ],
 );
 
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<AuthState> stream) { _subscription = stream.listen((_) => notifyListeners()); }
   late final StreamSubscription<AuthState> _subscription;
-  @override
-  void dispose() { _subscription.cancel(); super.dispose(); }
+  @override void dispose() { _subscription.cancel(); super.dispose(); }
 }
