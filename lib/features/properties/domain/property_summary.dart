@@ -2,6 +2,7 @@ class PropertySummary {
   const PropertySummary({
     required this.id,
     required this.name,
+    this.unitId,
     this.description,
     this.coverImageUrl,
     this.location,
@@ -11,6 +12,7 @@ class PropertySummary {
 
   final String id;
   final String name;
+  final String? unitId;
   final String? description;
   final String? coverImageUrl;
   final String? location;
@@ -18,8 +20,9 @@ class PropertySummary {
   final double? pricePerNight;
 
   factory PropertySummary.fromMap(Map<String, dynamic> map) => PropertySummary(
-        id: map['id'].toString(),
+        id: (map['property_id'] ?? map['id']).toString(),
         name: (map['name'] ?? map['title'] ?? 'بدون اسم').toString(),
+        unitId: map['unit_id']?.toString(),
         description: map['description']?.toString(),
         coverImageUrl: map['cover_image_url']?.toString() ?? map['coverImageUrl']?.toString(),
         location: map['location']?.toString(),
