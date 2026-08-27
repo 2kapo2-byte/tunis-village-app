@@ -1,11 +1,12 @@
-enum AppRole { guest, marketer, admin }
+enum AppRole { customer, owner, staff, superAdmin }
 
 extension AppRoleX on AppRole {
   String get value => switch (this) {
-        AppRole.guest => 'guest',
-        AppRole.marketer => 'marketer',
-        AppRole.admin => 'admin',
+        AppRole.customer => 'customer',
+        AppRole.owner => 'owner',
+        AppRole.staff => 'staff',
+        AppRole.superAdmin => 'super_admin',
       };
 
-  bool get canUsePartnerMode => this == AppRole.marketer || this == AppRole.admin;
+  bool get canUsePartnerMode => false;
 }
