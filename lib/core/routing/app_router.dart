@@ -1,16 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/profile_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
+import '../../features/search/domain/search_query.dart';
 import '../../features/search/presentation/search_screen.dart';
-import '../../features/properties/presentation/properties_results_screen.dart';
 import '../../features/properties/data/property_repository.dart';
 import '../../features/properties/domain/property_summary.dart';
+import '../../features/properties/presentation/properties_results_screen.dart';
 import '../../features/properties/presentation/property_details_screen.dart';
 import '../../features/booking/data/booking_repository.dart';
 import '../../features/booking/domain/booking_result.dart';
@@ -37,42 +37,31 @@ final appRouter = GoRouter(
     GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
     GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
     GoRoute(path: '/search', builder: (context, state) => const SearchScreen()),
-    GoRoute(
-      path: '/properties',
-      builder: (context, state) {
-        final query = state.extra;
-        if (query is! dynamic) return const SearchScreen();
-        return PropertiesResultsScreen(query: query, repository: PropertyRepository(Supabase.instance.client));
-      },
-    ),
-    GoRoute(
-      path: '/property-details',
-      builder: (context, state) {
-        final property = state.extra;
-        if (property is! PropertySummary) return const SearchScreen();
-        return PropertyDetailsScreen(property: property);
-      },
-    ),
-    GoRoute(
-      path: '/booking-review',
-      builder: (context, state) {
-        final request = state.extra;
-        if (request is! CreateBookingRequest) return const SearchScreen();
-        return CustomerBookingReviewScreen(request: request, repository: BookingRepository(Supabase.instance.client));
-      },
-    ),
-    GoRoute(
-      path: '/booking-confirmation',
-      builder: (context, state) {
-        final result = state.extra;
-        if (result is! BookingResult) return const SearchScreen();
-        return BookingConfirmationScreen(result: result, onViewBookings: () => context.go('/my-bookings'), onGoHome: () => context.go('/'));
-      },
-    ),
-    GoRoute(
-      path: '/my-bookings',
-      builder: (context, state) => MyBookingsScreen(repository: BookingRepository(Supabase.instance.client)),
-    ),
+    GoRoute(path: '/properties', builder: (context, state) {
+      final query = state.extra;
+      if (query is! SearchQuery) return const SearchScreen();
+      return PropertiesResultsScreen(query: query, repository: PropertyRepository(Supabase.instance.client));
+    }),
+    GoRoute(path: '/property-details', builder: (context, state) {
+      final property = state.extra;
+      if (property is! PropertySummary) return const SearchScreen();
+      return PropertyDetailsScreen(property: property);
+    }),
+    GoRoute(path: '/booking-review', builder: (context, state) {
+      final request = state.extra;
+      if (request is! CreateBookingRequest) return const SearchScreen();
+      return CustomerBookingReviewScreen(request: request, repository: BookingRepository(Supabase.instance.client));
+    }),
+    GoRoute(path: '/booking-confirmation', builder: (context, state) {
+      final result = state.extra;
+      if (result is! BookingResult) return const SearchScreen();
+      return BookingConfirmationScreen(result: result, onViewBookings: () => context.go('/my-bookings'), onGoHome: () => context.go('/'));
+    }),
+    GoRoute(path: '/my-bookings', builder: (context, state) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) return const LoginScreen();
+      return MyBookingsScreen(repository: BookingRepository(Supabase.instance.client), customerId: user.id);
+    }),
   ],
 );
 
