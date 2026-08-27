@@ -9,6 +9,10 @@ class CreateBookingRequest {
     required this.childAges,
     this.customerNotes,
     this.paymentMethod,
+    this.partnerMode = false,
+    this.guestFullName,
+    this.guestPhone,
+    this.guestEmail,
   });
 
   final String unitId;
@@ -20,6 +24,10 @@ class CreateBookingRequest {
   final List<int> childAges;
   final String? customerNotes;
   final String? paymentMethod;
+  final bool partnerMode;
+  final String? guestFullName;
+  final String? guestPhone;
+  final String? guestEmail;
 
   int get guests => adults + childrenCount;
 
@@ -34,6 +42,11 @@ class CreateBookingRequest {
         'child_ages': childAges,
         'payment_method': paymentMethod,
         'customer_notes': customerNotes,
+        // Guest contact data is collected only at booking time. Partner
+        // attribution/customer identity must be resolved server-side.
+        'guest_full_name': guestFullName,
+        'guest_phone': guestPhone,
+        'guest_email': guestEmail,
       };
 
   static String _date(DateTime value) =>
