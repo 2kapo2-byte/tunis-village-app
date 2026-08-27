@@ -19,6 +19,7 @@ import '../../features/booking/domain/create_booking_request.dart';
 import '../../features/booking/presentation/customer_booking_review_screen.dart';
 import '../../features/booking/presentation/booking_confirmation_screen.dart';
 import '../../features/booking/presentation/my_bookings_screen.dart';
+import '../../features/partner/presentation/partner_customers_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -38,6 +39,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
     GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
     GoRoute(path: '/search', builder: (context, state) => const SearchScreen()),
+    GoRoute(path: '/partner-customers', builder: (context, state) => const PartnerCustomersScreen()),
     GoRoute(path: '/properties', builder: (context, state) {
       final query = state.extra;
       if (query is! SearchQuery) return const SearchScreen();
