@@ -51,7 +51,8 @@ class BookingRepository {
         'check_out': _date(checkOut),
         'adults': guests.adults,
         'children_count': guests.childrenCount,
-        'child_ages': guests.childAges.map((age) => {'age': age}).toList(),
+        // The Partner RPC expects a JSON array of integer ages.
+        'child_ages': guests.childAges,
         'guest_full_name': guestFullName.trim(),
         'guest_phone': guestPhone.trim(),
         'guest_email': guestEmail?.trim(),
