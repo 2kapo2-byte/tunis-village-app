@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -43,9 +44,12 @@ final appRouter = GoRouter(
       return PropertiesResultsScreen(query: query, repository: PropertyRepository(Supabase.instance.client));
     }),
     GoRoute(path: '/property-details', builder: (context, state) {
-      final property = state.extra;
-      if (property is! PropertySummary) return const SearchScreen();
-      return PropertyDetailsScreen(property: property);
+      final args = state.extra;
+      if (args is! Map) return const SearchScreen();
+      final property = args['property'];
+      final query = args['query'];
+      if (property is! PropertySummary || query is! SearchQuery) return const SearchScreen();
+      return PropertyDetailsScreen(property: property, query: query);
     }),
     GoRoute(path: '/booking-review', builder: (context, state) {
       final request = state.extra;
