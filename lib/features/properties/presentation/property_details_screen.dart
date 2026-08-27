@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../booking/domain/create_booking_request.dart';
 import '../../search/domain/search_query.dart';
 import '../domain/property_summary.dart';
@@ -41,11 +40,12 @@ class PropertyDetailsScreen extends StatelessWidget {
               adults: q.guests.adults,
               childrenCount: q.guests.childrenCount,
               childAges: List<int>.from(q.guests.childAges),
+              partnerMode: q.partnerMode,
             );
-            context.push('/booking-review', extra: request);
+            context.push(q.partnerMode ? '/partner-booking-details' : '/booking-review', extra: request);
           }),
           icon: const Icon(Icons.calendar_month_outlined),
-          label: const Text('متابعة الحجز'),
+          label: Text(query?.partnerMode == true ? 'بيانات العميل ومتابعة الحجز' : 'متابعة الحجز'),
         )),
       ]),
     );
