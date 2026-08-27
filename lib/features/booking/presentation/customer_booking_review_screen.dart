@@ -8,8 +8,7 @@ class CustomerBookingReviewScreen extends StatefulWidget {
   const CustomerBookingReviewScreen({super.key, required this.request, required this.repository});
   final CreateBookingRequest request;
   final BookingRepository repository;
-  @override
-  State<CustomerBookingReviewScreen> createState() => _CustomerBookingReviewScreenState();
+  @override State<CustomerBookingReviewScreen> createState() => _CustomerBookingReviewScreenState();
 }
 
 class _CustomerBookingReviewScreenState extends State<CustomerBookingReviewScreen> {
@@ -20,13 +19,16 @@ class _CustomerBookingReviewScreenState extends State<CustomerBookingReviewScree
     if (_submitting) return;
     setState(() { _submitting = true; _error = null; });
     try {
-      final result = await widget.repository.createBooking(
-        unitId: widget.request.unitId,
-        propertyId: widget.request.propertyId,
-        checkIn: widget.request.checkIn,
-        checkOut: widget.request.checkOut,
-        guests: GuestComposition(adults: widget.request.adults, childAges: List<int>.from(widget.request.childAges)),
-      );
+      final r = widget.request;
+      final result = r.partnerMode
+          ? await widget.repository.createPartnerBooking(request: r)
+          : await widget.repository.createBooking(
+              unitId: r.unitId,
+              propertyId: r.propertyId,
+              checkIn: r.checkIn,
+              checkOut: r.checkOut,
+              guests: GuestComposition(adults: r.adults, childAges: List<int>.from(r.childAges)),
+            );
       if (!mounted) return;
       context.push('/booking-confirmation', extra: result);
     } catch (e) {
@@ -38,17 +40,22 @@ class _CustomerBookingReviewScreenState extends State<CustomerBookingReviewScree
 
   @override
   Widget build(BuildContext context) {
-    final nights = widget.request.checkOut.difference(widget.request.checkIn).inDays;
+    final r = widget.request;
+    final nights = r.checkOut.difference(r.checkIn).inDays;
     return Scaffold(
       appBar: AppBar(title: const Text('مراجعة الحجز')),
       body: ListView(padding: const EdgeInsets.all(20), children: [
+        if (r.partnerMode)
+          Card(child: ListTile(leading: const Icon(Icons.business_center_outlined), title: const Text('حجز بالنيابة عن عميل'), subtitle: Text(r.guestFullName ?? 'بيانات العميل'))),
         Text('تفاصيل الإقامة', style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 16),
-        ListTile(title: const Text('الوصول'), subtitle: Text(_date(widget.request.checkIn))),
-        ListTile(title: const Text('المغادرة'), subtitle: Text(_date(widget.request.checkOut))),
+        ListTile(title: const Text('الوصول'), subtitle: Text(_date(r.checkIn))),
+        ListTile(title: const Text('المغادرة'), subtitle: Text(_date(r.checkOut))),
         ListTile(title: const Text('الليالي'), subtitle: Text('$nights')),
-        ListTile(title: const Text('الضيوف'), subtitle: Text('${widget.request.adults} بالغ + ${widget.request.childrenCount} طفل')),
-        if (widget.request.childAges.isNotEmpty) ListTile(title: const Text('أعمار الأطفال'), subtitle: Text(widget.request.childAges.join('، '))),
+        ListTile(title: const Text('الضيوف'), subtitle: Text('${r.adults} بالغ + ${r.childrenCount} طفل')),
+        if (r.childAges.isNotEmpty) ListTile(title: const Text('أعمار الأطفال'), subtitle: Text(r.childAges.join('، '))),
+        if (r.partnerMode && r.guestPhone != null) ListTile(title: const Text('هاتف العميل'), subtitle: Text(r.guestPhone!)),
+        if (r.partnerMode && r.guestEmail != null) ListTile(title: const Text('بريد العميل'), subtitle: Text(r.guestEmail!)),
         if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error))),
         const SizedBox(height: 24),
         FilledButton(onPressed: _submitting ? null : _confirm, child: Text(_submitting ? 'جاري التأكيد...' : 'تأكيد الحجز')),
