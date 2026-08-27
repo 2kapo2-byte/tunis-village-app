@@ -10,6 +10,9 @@ class PropertyDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final price = property.pricePerNight;
+    final capacity = property.maxGuests;
+
     return Scaffold(
       appBar: AppBar(title: const Text('تفاصيل الإقامة')),
       body: ListView(
@@ -31,6 +34,18 @@ class PropertyDetailsScreen extends StatelessWidget {
           ),
           if (property.location != null)
             ListTile(leading: const Icon(Icons.location_on_outlined), title: Text(property.location!)),
+          if (capacity != null || price != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  if (capacity != null) Chip(avatar: const Icon(Icons.people_outline, size: 18), label: Text('حتى $capacity ضيف')),
+                  if (price != null) Chip(avatar: const Icon(Icons.payments_outlined, size: 18), label: Text('${price.toStringAsFixed(0)} جنيه / ليلة')),
+                ],
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.all(20),
             child: Text(property.description?.trim().isNotEmpty == true ? property.description! : 'لا يوجد وصف متاح حاليًا.'),
