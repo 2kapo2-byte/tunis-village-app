@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../booking/domain/create_booking_request.dart';
 import '../../search/domain/search_query.dart';
@@ -6,7 +7,6 @@ import '../domain/property_summary.dart';
 
 class PropertyDetailsScreen extends StatelessWidget {
   const PropertyDetailsScreen({super.key, required this.property, this.query, this.onBook});
-
   final PropertySummary property;
   final SearchQuery? query;
   final VoidCallback? onBook;
@@ -34,7 +34,7 @@ class PropertyDetailsScreen extends StatelessWidget {
           onPressed: onBook ?? (query == null ? null : () {
             final q = query!;
             final request = CreateBookingRequest(
-              unitId: property.id,
+              unitId: property.unitId ?? property.id,
               propertyId: property.id,
               checkIn: q.checkIn,
               checkOut: q.checkOut,
@@ -42,7 +42,7 @@ class PropertyDetailsScreen extends StatelessWidget {
               childrenCount: q.guests.childrenCount,
               childAges: List<int>.from(q.guests.childAges),
             );
-            Navigator.of(context).pushNamed('/booking-review', arguments: request);
+            context.push('/booking-review', extra: request);
           }),
           icon: const Icon(Icons.calendar_month_outlined),
           label: const Text('متابعة الحجز'),
