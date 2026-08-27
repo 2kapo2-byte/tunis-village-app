@@ -9,7 +9,7 @@ class RoleResolver {
 
   Future<AppRole> resolveCurrentRole() async {
     final user = client.auth.currentUser;
-    if (user == null) return AppRole.guest;
+    if (user == null) return AppRole.customer;
 
     final row = await client
         .from('profiles')
@@ -19,9 +19,11 @@ class RoleResolver {
 
     final value = row?['role']?.toString().toLowerCase();
     return switch (value) {
-      'admin' || 'platform_admin' => AppRole.admin,
-      'marketer' || 'partner' => AppRole.marketer,
-      _ => AppRole.guest,
+      'super_admin' => AppRole.superAdmin,
+      'owner' => AppRole.owner,
+      'staff' => AppRole.staff,
+      'customer' => AppRole.customer,
+      _ => AppRole.customer,
     };
   }
 }
