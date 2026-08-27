@@ -28,8 +28,14 @@ class BookingRepository {
     return BookingResult.fromRpc(data);
   }
 
-  Future<List<Booking>> myBookings(String customerId) async {
-    final rows = await _client.from('bookings').select().eq('customer_id', customerId).order('created_at', ascending: false);
-    return rows.map((row) => Booking.fromMap(row)).toList();
+  Future<List<Booking>> myBookings() async {
+    final user = _client.auth.currentUser;
+    if (user == null) return const [];
+    final rows = await _client
+        .from('bookings')
+        .select()
+        .eq('customer_id', user.id)
+        .order('created_at', ascending: false);
+    return rows.map((row) => Booking.fromMap(row)).toList(growable: false);
   }
 }
