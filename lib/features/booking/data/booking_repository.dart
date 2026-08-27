@@ -2,20 +2,21 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/models/booking.dart';
 import '../../../core/models/guest_composition.dart';
+import '../domain/booking_result.dart';
 
 class BookingRepository {
   const BookingRepository(this._client);
 
   final SupabaseClient _client;
 
-  Future<dynamic> createBooking({
+  Future<BookingResult> createBooking({
     required String unitId,
     required String propertyId,
     required DateTime checkIn,
     required DateTime checkOut,
     required GuestComposition guests,
-  }) {
-    return _client.rpc('create_booking', params: {
+  }) async {
+    final data = await _client.rpc('create_booking', params: {
       'p_unit_id': unitId,
       'p_property_id': propertyId,
       'p_check_in': checkIn.toIso8601String(),
@@ -24,6 +25,7 @@ class BookingRepository {
       'p_children_count': guests.childrenCount,
       'p_child_ages': guests.childAges,
     });
+    return BookingResult.fromRpc(data);
   }
 
   Future<List<Booking>> myBookings(String customerId) async {
