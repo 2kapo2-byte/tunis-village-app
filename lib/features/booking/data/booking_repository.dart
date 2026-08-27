@@ -15,7 +15,6 @@ class BookingRepository {
     required DateTime checkOut,
     required GuestComposition guests,
   }) {
-    // The backend RPC remains the authority for availability, pricing and state transitions.
     return _client.rpc('create_booking', params: {
       'p_unit_id': unitId,
       'p_property_id': propertyId,
