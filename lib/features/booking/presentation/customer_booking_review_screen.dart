@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/models/guest_composition.dart';
 import '../data/booking_repository.dart';
 import '../domain/create_booking_request.dart';
@@ -7,7 +8,6 @@ class CustomerBookingReviewScreen extends StatefulWidget {
   const CustomerBookingReviewScreen({super.key, required this.request, required this.repository});
   final CreateBookingRequest request;
   final BookingRepository repository;
-
   @override
   State<CustomerBookingReviewScreen> createState() => _CustomerBookingReviewScreenState();
 }
@@ -15,7 +15,6 @@ class CustomerBookingReviewScreen extends StatefulWidget {
 class _CustomerBookingReviewScreenState extends State<CustomerBookingReviewScreen> {
   bool _submitting = false;
   String? _error;
-
   Future<void> _confirm() async {
     if (_submitting) return;
     setState(() { _submitting = true; _error = null; });
@@ -28,14 +27,13 @@ class _CustomerBookingReviewScreenState extends State<CustomerBookingReviewScree
         guests: GuestComposition(adults: widget.request.adults, childAges: widget.request.childAges),
       );
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed('/booking-confirmation', arguments: result);
+      context.push('/booking-confirmation', extra: result);
     } catch (e) {
       if (mounted) setState(() => _error = e.toString());
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final nights = widget.request.checkOut.difference(widget.request.checkIn).inDays;
@@ -52,6 +50,5 @@ class _CustomerBookingReviewScreenState extends State<CustomerBookingReviewScree
       FilledButton(onPressed: _submitting ? null : _confirm, child: Text(_submitting ? 'جاري التأكيد...' : 'تأكيد الحجز')),
     ]));
   }
-
   static String _date(DateTime value) => '${value.day.toString().padLeft(2, '0')}/${value.month.toString().padLeft(2, '0')}/${value.year}';
 }
