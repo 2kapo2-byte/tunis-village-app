@@ -9,6 +9,7 @@ import '../../features/auth/presentation/register_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/search/domain/search_query.dart';
 import '../../features/search/presentation/search_screen.dart';
+import '../../features/properties/data/property_repository.dart';
 import '../../features/properties/domain/property_summary.dart';
 import '../../features/properties/presentation/properties_results_screen.dart';
 import '../../features/properties/presentation/property_details_screen.dart';
@@ -75,6 +76,7 @@ final appRouter = GoRouter(
         property: property,
         query: query,
         partnerMode: partnerMode,
+        repository: PropertyRepository(Supabase.instance.client),
       );
     }),
     GoRoute(path: '/partner-booking-details', builder: (context, state) {
