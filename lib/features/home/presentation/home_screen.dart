@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -31,7 +32,7 @@ class HomeScreen extends StatelessWidget {
                         const Text('ابدأ البحث'),
                         const SizedBox(height: 14),
                         FilledButton.icon(
-                          onPressed: null,
+                          onPressed: () => context.push('/search'),
                           icon: const Icon(Icons.search),
                           label: const Text('البحث عن وحدات متاحة'),
                         ),
