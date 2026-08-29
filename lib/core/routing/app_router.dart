@@ -22,6 +22,8 @@ import '../../features/booking/presentation/customer_booking_review_screen.dart'
 import '../../features/booking/presentation/partner_booking_details_screen.dart';
 import '../../features/booking/presentation/booking_confirmation_screen.dart';
 import '../../features/booking/presentation/my_bookings_screen.dart';
+import '../../features/payment/data/payment_repository.dart';
+import '../../features/payment/presentation/payment_status_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -90,8 +92,21 @@ final appRouter = GoRouter(
       if (result is! BookingResult) return const SearchScreen();
       return BookingConfirmationScreen(
         result: result,
+        onViewPayment: result.bookingId == null
+            ? null
+            : () => context.push('/payment-status', extra: result),
         onViewBookings: () => context.go('/my-bookings'),
         onGoHome: () => context.go('/'),
+      );
+    }),
+    GoRoute(path: '/payment-status', builder: (context, state) {
+      final result = state.extra;
+      if (result is! BookingResult || result.bookingId == null) return const SearchScreen();
+      return PaymentStatusScreen(
+        bookingId: result.bookingId!,
+        paymentId: result.paymentId,
+        initialMethod: null,
+        repository: PaymentRepository(Supabase.instance.client),
       );
     }),
     GoRoute(
