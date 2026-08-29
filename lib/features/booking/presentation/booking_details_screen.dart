@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/models/booking.dart';
-import '../../payment/data/payment_repository.dart';
-import '../../payment/presentation/payment_status_screen.dart';
 
 class BookingDetailsScreen extends StatelessWidget {
   const BookingDetailsScreen({super.key, required this.booking});
@@ -33,10 +31,7 @@ class BookingDetailsScreen extends StatelessWidget {
           const SizedBox(height: 24),
           if (booking.status != BookingStatus.cancelled && booking.status != BookingStatus.refunded)
             FilledButton.icon(
-              onPressed: () => context.push(
-                '/payment-status',
-                extra: booking.id,
-              ),
+              onPressed: () => context.push('/payment-status', extra: booking.id),
               icon: const Icon(Icons.payments_outlined),
               label: const Text('حالة الدفع'),
             ),
