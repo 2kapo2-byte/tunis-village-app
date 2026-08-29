@@ -29,6 +29,8 @@ import '../../features/payment/data/payment_repository.dart';
 import '../../features/payment/presentation/payment_status_screen.dart';
 import '../../features/reviews/data/review_repository.dart';
 import '../../features/reviews/presentation/create_review_screen.dart';
+import '../../features/notifications/data/notifications_repository.dart';
+import '../../features/notifications/presentation/notifications_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -87,9 +89,7 @@ final appRouter = GoRouter(
     }),
     GoRoute(path: '/payment-status', builder: (context, state) {
       final extra = state.extra;
-      if (extra is BookingResult && extra.bookingId != null) {
-        return PaymentStatusScreen(bookingId: extra.bookingId!, paymentId: extra.paymentId, repository: PaymentRepository(Supabase.instance.client));
-      }
+      if (extra is BookingResult && extra.bookingId != null) return PaymentStatusScreen(bookingId: extra.bookingId!, paymentId: extra.paymentId, repository: PaymentRepository(Supabase.instance.client));
       if (extra is String) return PaymentStatusScreen(bookingId: extra, repository: PaymentRepository(Supabase.instance.client));
       return const SearchScreen();
     }),
@@ -98,6 +98,7 @@ final appRouter = GoRouter(
       if (booking is! Booking || booking.status != BookingStatus.completed) return const SearchScreen();
       return CreateReviewScreen(bookingId: booking.id, propertyId: booking.propertyId, repository: ReviewRepository(Supabase.instance.client));
     }),
+    GoRoute(path: '/notifications', builder: (context, state) => NotificationsScreen(repository: NotificationsRepository(Supabase.instance.client))),
     GoRoute(path: '/my-bookings', builder: (context, state) => MyBookingsScreen(repository: BookingRepository(Supabase.instance.client))),
   ],
 );
