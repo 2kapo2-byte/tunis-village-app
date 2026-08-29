@@ -31,7 +31,9 @@ final appRouter = GoRouter(
     if (session != null && isPublic) return '/';
     return null;
   },
-  refreshListenable: GoRouterRefreshStream(Supabase.instance.client.auth.onAuthStateChange),
+  refreshListenable: GoRouterRefreshStream(
+    Supabase.instance.client.auth.onAuthStateChange,
+  ),
   routes: [
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
     GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
@@ -39,41 +41,85 @@ final appRouter = GoRouter(
     GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
     GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
     GoRoute(path: '/search', builder: (context, state) => const SearchScreen()),
-    GoRoute(path: '/partner-search', builder: (context, state) => const SearchScreen(partnerMode: true)),
+    GoRoute(
+      path: '/partner-search',
+      builder: (context, state) => const SearchScreen(partnerMode: true),
+    ),
     GoRoute(path: '/properties', builder: (context, state) {
       final extra = state.extra;
-      final query = extra is SearchQuery ? extra : extra is Map ? extra['query'] : null;
+      final query = extra is SearchQuery
+          ? extra
+          : extra is Map<String, dynamic>
+              ? extra['query']
+              : null;
+      final partnerMode = extra is Map<String, dynamic>
+          ? extra['partnerMode'] == true
+          : false;
       if (query is! SearchQuery) return const SearchScreen();
-      return PropertiesResultsScreen(query: query, repository: AvailabilityRepository(Supabase.instance.client));
+      return PropertiesResultsScreen(
+        query: query,
+        partnerMode: partnerMode,
+        repository: AvailabilityRepository(Supabase.instance.client),
+      );
     }),
     GoRoute(path: '/property-details', builder: (context, state) {
       final args = state.extra;
-      if (args is! Map) return const SearchScreen();
-      final property = args['property']; final query = args['query'];
-      if (property is! PropertySummary || query is! SearchQuery) return const SearchScreen();
-      return PropertyDetailsScreen(property: property, query: query);
+      if (args is! Map<String, dynamic>) return const SearchScreen();
+      final property = args['property'];
+      final query = args['query'];
+      final partnerMode = args['partnerMode'] == true;
+      if (property is! PropertySummary || query is! SearchQuery) {
+        return const SearchScreen();
+      }
+      return PropertyDetailsScreen(
+        property: property,
+        query: query,
+        partnerMode: partnerMode,
+      );
     }),
     GoRoute(path: '/partner-booking-details', builder: (context, state) {
       final request = state.extra;
-      if (request is! CreateBookingRequest || !request.partnerMode) return const SearchScreen();
+      if (request is! CreateBookingRequest || !request.partnerMode) {
+        return const SearchScreen();
+      }
       return PartnerBookingDetailsScreen(request: request);
     }),
     GoRoute(path: '/booking-review', builder: (context, state) {
       final request = state.extra;
       if (request is! CreateBookingRequest) return const SearchScreen();
-      return CustomerBookingReviewScreen(request: request, repository: BookingRepository(Supabase.instance.client));
+      return CustomerBookingReviewScreen(
+        request: request,
+        repository: BookingRepository(Supabase.instance.client),
+      );
     }),
     GoRoute(path: '/booking-confirmation', builder: (context, state) {
       final result = state.extra;
       if (result is! BookingResult) return const SearchScreen();
-      return BookingConfirmationScreen(result: result, onViewBookings: () => context.go('/my-bookings'), onGoHome: () => context.go('/'));
+      return BookingConfirmationScreen(
+        result: result,
+        onViewBookings: () => context.go('/my-bookings'),
+        onGoHome: () => context.go('/'),
+      );
     }),
-    GoRoute(path: '/my-bookings', builder: (context, state) => MyBookingsScreen(repository: BookingRepository(Supabase.instance.client))),
+    GoRoute(
+      path: '/my-bookings',
+      builder: (context, state) => MyBookingsScreen(
+        repository: BookingRepository(Supabase.instance.client),
+      ),
+    ),
   ],
 );
 
 class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream<AuthState> stream) { _subscription = stream.listen((_) => notifyListeners()); }
+  GoRouterRefreshStream(Stream<AuthState> stream) {
+    _subscription = stream.listen((_) => notifyListeners());
+  }
+
   late final StreamSubscription<AuthState> _subscription;
-  @override void dispose() { _subscription.cancel(); super.dispose(); }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
 }
