@@ -4,12 +4,7 @@ import '../../../core/models/booking.dart';
 import '../../cancellation/data/cancellation_repository.dart';
 
 class BookingDetailsScreen extends StatefulWidget {
-  const BookingDetailsScreen({
-    super.key,
-    required this.booking,
-    required this.cancellationRepository,
-  });
-
+  const BookingDetailsScreen({super.key, required this.booking, required this.cancellationRepository});
   final Booking booking;
   final CancellationRepository cancellationRepository;
 
@@ -36,11 +31,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
         final controller = TextEditingController();
         return AlertDialog(
           title: const Text('إلغاء الحجز'),
-          content: TextField(
-            controller: controller,
-            maxLines: 3,
-            decoration: const InputDecoration(hintText: 'سبب الإلغاء (اختياري)'),
-          ),
+          content: TextField(controller: controller, maxLines: 3, decoration: const InputDecoration(hintText: 'سبب الإلغاء (اختياري)')),
           actions: [
             TextButton(onPressed: () => Navigator.pop(context), child: const Text('رجوع')),
             FilledButton(onPressed: () => Navigator.pop(context, controller.text.trim()), child: const Text('تأكيد الإلغاء')),
@@ -49,16 +40,9 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
       },
     );
     if (reason == null || _cancelling) return;
-    setState(() {
-      _cancelling = true;
-      _error = null;
-      _message = null;
-    });
+    setState(() { _cancelling = true; _error = null; _message = null; });
     try {
-      final result = await widget.cancellationRepository.cancel(
-        bookingId: widget.booking.id,
-        reason: reason.isEmpty ? null : reason,
-      );
+      final result = await widget.cancellationRepository.cancel(bookingId: widget.booking.id, reason: reason.isEmpty ? null : reason);
       if (!mounted) return;
       setState(() {
         _message = 'تم إلغاء الحجز. المبلغ المتوقع رده: ${result.refundAmount.toStringAsFixed(2)} جنيه (${result.refundPercent.toStringAsFixed(0)}%).';
@@ -74,9 +58,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final booking = widget.booking;
-    final cancellable = booking.status != BookingStatus.cancelled &&
-        booking.status != BookingStatus.completed &&
-        booking.status != BookingStatus.refunded;
+    final cancellable = booking.status != BookingStatus.cancelled && booking.status != BookingStatus.completed && booking.status != BookingStatus.refunded;
     return Scaffold(
       appBar: AppBar(title: const Text('تفاصيل الحجز')),
       body: ListView(
@@ -101,33 +83,25 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
             builder: (context, snapshot) {
               final refund = snapshot.data;
               if (refund == null) return const SizedBox.shrink();
-              return Card(
-                child: ListTile(
-                  leading: const Icon(Icons.currency_exchange),
-                  title: Text('استرداد: ${refund.status}'),
-                  subtitle: Text('${refund.amount.toStringAsFixed(2)} جنيه${refund.reason == null ? '' : '\n${refund.reason}'}'),
-                ),
-              );
+              return Card(child: ListTile(leading: const Icon(Icons.currency_exchange), title: Text('استرداد: ${refund.status}'), subtitle: Text('${refund.amount.toStringAsFixed(2)} جنيه${refund.reason == null ? '' : '\n${refund.reason}'}')));
             },
           ),
           if (_message != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_message!)),
           if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error))),
           const SizedBox(height: 20),
           if (booking.status != BookingStatus.cancelled && booking.status != BookingStatus.refunded)
-            FilledButton.icon(
-              onPressed: () => context.push('/payment-status', extra: booking.id),
-              icon: const Icon(Icons.payments_outlined),
-              label: const Text('حالة الدفع'),
-            ),
-          if (cancellable)
+            FilledButton.icon(onPressed: () => context.push('/payment-status', extra: booking.id), icon: const Icon(Icons.payments_outlined), label: const Text('حالة الدفع')),
+          if (booking.status == BookingStatus.completed)
             Padding(
               padding: const EdgeInsets.only(top: 10),
               child: OutlinedButton.icon(
-                onPressed: _cancelling ? null : _cancel,
-                icon: const Icon(Icons.cancel_outlined),
-                label: Text(_cancelling ? 'جاري الإلغاء...' : 'إلغاء الحجز'),
+                onPressed: () => context.push('/create-review', extra: booking),
+                icon: const Icon(Icons.star_outline),
+                label: const Text('قيّم إقامتك'),
               ),
             ),
+          if (cancellable)
+            Padding(padding: const EdgeInsets.only(top: 10), child: OutlinedButton.icon(onPressed: _cancelling ? null : _cancel, icon: const Icon(Icons.cancel_outlined), label: Text(_cancelling ? 'جاري الإلغاء...' : 'إلغاء الحجز'))),
         ],
       ),
     );
@@ -135,7 +109,6 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
 
   Widget _info(String label, String value) => Card(child: ListTile(title: Text(label), trailing: Text(value, textAlign: TextAlign.end)));
   static String _date(DateTime value) => '${value.day.toString().padLeft(2, '0')}/${value.month.toString().padLeft(2, '0')}/${value.year}';
-
   static String _statusLabel(BookingStatus status) {
     switch (status) {
       case BookingStatus.pending: return 'قيد الانتظار';
@@ -151,7 +124,6 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
       case BookingStatus.unknown: return 'غير معروف';
     }
   }
-
   static String _methodLabel(String method) {
     switch (method) {
       case 'cash_on_arrival': return 'الدفع عند الوصول';
