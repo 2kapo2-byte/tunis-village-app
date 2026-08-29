@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../core/models/booking.dart';
 import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/profile_screen.dart';
@@ -26,7 +27,8 @@ import '../../features/booking/presentation/my_bookings_screen.dart';
 import '../../features/cancellation/data/cancellation_repository.dart';
 import '../../features/payment/data/payment_repository.dart';
 import '../../features/payment/presentation/payment_status_screen.dart';
-import '../../core/models/booking.dart';
+import '../../features/reviews/data/review_repository.dart';
+import '../../features/reviews/presentation/create_review_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -88,10 +90,13 @@ final appRouter = GoRouter(
       if (extra is BookingResult && extra.bookingId != null) {
         return PaymentStatusScreen(bookingId: extra.bookingId!, paymentId: extra.paymentId, repository: PaymentRepository(Supabase.instance.client));
       }
-      if (extra is String) {
-        return PaymentStatusScreen(bookingId: extra, repository: PaymentRepository(Supabase.instance.client));
-      }
+      if (extra is String) return PaymentStatusScreen(bookingId: extra, repository: PaymentRepository(Supabase.instance.client));
       return const SearchScreen();
+    }),
+    GoRoute(path: '/create-review', builder: (context, state) {
+      final booking = state.extra;
+      if (booking is! Booking || booking.status != BookingStatus.completed) return const SearchScreen();
+      return CreateReviewScreen(bookingId: booking.id, propertyId: booking.propertyId, repository: ReviewRepository(Supabase.instance.client));
     }),
     GoRoute(path: '/my-bookings', builder: (context, state) => MyBookingsScreen(repository: BookingRepository(Supabase.instance.client))),
   ],
