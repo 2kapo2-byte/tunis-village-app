@@ -84,10 +84,21 @@ class BookingRepository {
     if (user == null) return const [];
     final rows = await _client
         .from('bookings')
-        .select()
+        .select('*, booking_child_ages(age)')
         .eq('customer_id', user.id)
         .order('created_at', ascending: false);
-    return rows.map((row) => Booking.fromMap(row)).toList(growable: false);
+    return rows.map((row) {
+      final map = Map<String, dynamic>.from(row);
+      final childRows = map['booking_child_ages'];
+      if (childRows is List) {
+        map['child_ages'] = childRows
+            .whereType<Map>()
+            .map((item) => item['age'])
+            .whereType<num>()
+            .toList(growable: false);
+      }
+      return Booking.fromMap(map);
+    }).toList(growable: false);
   }
 
   BookingResult _bookingResult(Object? data) {
