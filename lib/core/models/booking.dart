@@ -3,10 +3,14 @@ import 'guest_composition.dart';
 enum BookingStatus {
   pending,
   confirmed,
-  checkedIn,
-  checkedOut,
+  paymentPending,
+  paid,
+  partiallyPaid,
   cancelled,
   rejected,
+  completed,
+  expired,
+  refunded,
   unknown,
 }
 
@@ -22,6 +26,10 @@ class Booking {
     required this.guests,
     required this.status,
     this.totalAmount,
+    this.basePrice,
+    this.cleaningFee,
+    this.paymentMethod,
+    this.customerNotes,
   });
 
   final String id;
@@ -34,10 +42,13 @@ class Booking {
   final GuestComposition guests;
   final BookingStatus status;
   final num? totalAmount;
+  final num? basePrice;
+  final num? cleaningFee;
+  final String? paymentMethod;
+  final String? customerNotes;
 
   factory Booking.fromMap(Map<String, dynamic> map) {
-    final statusName = (map['status'] as String? ?? '').toLowerCase();
-    final status = BookingStatus.values.where((item) => item.name == statusName).firstOrNull ?? BookingStatus.unknown;
+    final status = _status(map['status']);
     return Booking(
       id: map['id'].toString(),
       bookingCode: map['booking_code'] as String? ?? '',
@@ -48,14 +59,33 @@ class Booking {
       nights: (map['nights'] as num?)?.toInt() ?? 0,
       guests: GuestComposition(
         adults: (map['adults'] as num?)?.toInt() ?? 1,
-        childAges: ((map['child_ages'] as List?) ?? const []).map((e) => (e as num).toInt()).toList(),
+        childAges: ((map['child_ages'] as List?) ?? const [])
+            .whereType<num>()
+            .map((e) => e.toInt())
+            .toList(growable: false),
       ),
       status: status,
       totalAmount: map['total_amount'] as num?,
+      basePrice: map['base_price'] as num?,
+      cleaningFee: map['cleaning_fee'] as num?,
+      paymentMethod: map['payment_method']?.toString(),
+      customerNotes: map['customer_notes']?.toString(),
     );
   }
-}
 
-extension<T> on Iterable<T> {
-  T? get firstOrNull => isEmpty ? null : first;
+  static BookingStatus _status(Object? value) {
+    switch (value?.toString().toLowerCase()) {
+      case 'pending': return BookingStatus.pending;
+      case 'confirmed': return BookingStatus.confirmed;
+      case 'payment_pending': return BookingStatus.paymentPending;
+      case 'paid': return BookingStatus.paid;
+      case 'partially_paid': return BookingStatus.partiallyPaid;
+      case 'cancelled': return BookingStatus.cancelled;
+      case 'rejected': return BookingStatus.rejected;
+      case 'completed': return BookingStatus.completed;
+      case 'expired': return BookingStatus.expired;
+      case 'refunded': return BookingStatus.refunded;
+      default: return BookingStatus.unknown;
+    }
+  }
 }
