@@ -8,6 +8,8 @@ class PropertySummary {
     this.location,
     this.maxGuests,
     this.pricePerNight,
+    this.rating,
+    this.reviewsCount,
   });
 
   final String id;
@@ -18,6 +20,8 @@ class PropertySummary {
   final String? location;
   final int? maxGuests;
   final double? pricePerNight;
+  final double? rating;
+  final int? reviewsCount;
 
   factory PropertySummary.fromMap(Map<String, dynamic> map) => PropertySummary(
         id: (map['property_id'] ?? map['id']).toString(),
@@ -28,6 +32,8 @@ class PropertySummary {
         location: map['location']?.toString(),
         maxGuests: _toInt(map['max_guests'] ?? map['maxGuests'] ?? map['capacity']),
         pricePerNight: _toDouble(map['price_per_night'] ?? map['pricePerNight']),
+        rating: _toDouble(map['rating']),
+        reviewsCount: _toInt(map['reviews_count']),
       );
 
   static int? _toInt(Object? value) => value == null ? null : int.tryParse(value.toString());
