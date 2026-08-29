@@ -23,6 +23,7 @@ import '../../features/booking/presentation/customer_booking_review_screen.dart'
 import '../../features/booking/presentation/partner_booking_details_screen.dart';
 import '../../features/booking/presentation/booking_confirmation_screen.dart';
 import '../../features/booking/presentation/my_bookings_screen.dart';
+import '../../features/cancellation/data/cancellation_repository.dart';
 import '../../features/payment/data/payment_repository.dart';
 import '../../features/payment/presentation/payment_status_screen.dart';
 import '../../core/models/booking.dart';
@@ -48,18 +49,10 @@ final appRouter = GoRouter(
     GoRoute(path: '/partner-search', builder: (context, state) => const SearchScreen(partnerMode: true)),
     GoRoute(path: '/properties', builder: (context, state) {
       final extra = state.extra;
-      final query = extra is SearchQuery
-          ? extra
-          : extra is Map<String, dynamic>
-              ? extra['query']
-              : null;
+      final query = extra is SearchQuery ? extra : extra is Map<String, dynamic> ? extra['query'] : null;
       final partnerMode = extra is Map<String, dynamic> ? extra['partnerMode'] == true : false;
       if (query is! SearchQuery) return const SearchScreen();
-      return PropertiesResultsScreen(
-        query: query,
-        partnerMode: partnerMode,
-        repository: AvailabilityRepository(Supabase.instance.client),
-      );
+      return PropertiesResultsScreen(query: query, partnerMode: partnerMode, repository: AvailabilityRepository(Supabase.instance.client));
     }),
     GoRoute(path: '/property-details', builder: (context, state) {
       final args = state.extra;
@@ -68,12 +61,7 @@ final appRouter = GoRouter(
       final query = args['query'];
       final partnerMode = args['partnerMode'] == true;
       if (property is! PropertySummary || query is! SearchQuery) return const SearchScreen();
-      return PropertyDetailsScreen(
-        property: property,
-        query: query,
-        partnerMode: partnerMode,
-        repository: PropertyRepository(Supabase.instance.client),
-      );
+      return PropertyDetailsScreen(property: property, query: query, partnerMode: partnerMode, repository: PropertyRepository(Supabase.instance.client));
     }),
     GoRoute(path: '/partner-booking-details', builder: (context, state) {
       final request = state.extra;
@@ -83,63 +71,35 @@ final appRouter = GoRouter(
     GoRoute(path: '/booking-review', builder: (context, state) {
       final request = state.extra;
       if (request is! CreateBookingRequest) return const SearchScreen();
-      return CustomerBookingReviewScreen(
-        request: request,
-        repository: BookingRepository(Supabase.instance.client),
-        pricingRepository: PricingRepository(Supabase.instance.client),
-      );
+      return CustomerBookingReviewScreen(request: request, repository: BookingRepository(Supabase.instance.client), pricingRepository: PricingRepository(Supabase.instance.client));
     }),
     GoRoute(path: '/booking-confirmation', builder: (context, state) {
       final result = state.extra;
       if (result is! BookingResult) return const SearchScreen();
-      return BookingConfirmationScreen(
-        result: result,
-        onViewPayment: result.bookingId == null ? null : () => context.push('/payment-status', extra: result),
-        onViewBookings: () => context.go('/my-bookings'),
-        onGoHome: () => context.go('/'),
-      );
+      return BookingConfirmationScreen(result: result, onViewPayment: result.bookingId == null ? null : () => context.push('/payment-status', extra: result), onViewBookings: () => context.go('/my-bookings'), onGoHome: () => context.go('/'));
     }),
     GoRoute(path: '/booking-details', builder: (context, state) {
       final booking = state.extra;
       if (booking is! Booking) return const SearchScreen();
-      return BookingDetailsScreen(booking: booking);
+      return BookingDetailsScreen(booking: booking, cancellationRepository: CancellationRepository(Supabase.instance.client));
     }),
     GoRoute(path: '/payment-status', builder: (context, state) {
       final extra = state.extra;
       if (extra is BookingResult && extra.bookingId != null) {
-        return PaymentStatusScreen(
-          bookingId: extra.bookingId!,
-          paymentId: extra.paymentId,
-          repository: PaymentRepository(Supabase.instance.client),
-        );
+        return PaymentStatusScreen(bookingId: extra.bookingId!, paymentId: extra.paymentId, repository: PaymentRepository(Supabase.instance.client));
       }
       if (extra is String) {
-        return PaymentStatusScreen(
-          bookingId: extra,
-          repository: PaymentRepository(Supabase.instance.client),
-        );
+        return PaymentStatusScreen(bookingId: extra, repository: PaymentRepository(Supabase.instance.client));
       }
       return const SearchScreen();
     }),
-    GoRoute(
-      path: '/my-bookings',
-      builder: (context, state) => MyBookingsScreen(
-        repository: BookingRepository(Supabase.instance.client),
-      ),
-    ),
+    GoRoute(path: '/my-bookings', builder: (context, state) => MyBookingsScreen(repository: BookingRepository(Supabase.instance.client))),
   ],
 );
 
 class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream<AuthState> stream) {
-    _subscription = stream.listen((_) => notifyListeners());
-  }
-
+  GoRouterRefreshStream(Stream<AuthState> stream) { _subscription = stream.listen((_) => notifyListeners()); }
   late final StreamSubscription<AuthState> _subscription;
-
   @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
-  }
+  void dispose() { _subscription.cancel(); super.dispose(); }
 }
