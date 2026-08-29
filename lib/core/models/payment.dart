@@ -1,4 +1,4 @@
-enum PaymentStatus { pending, authorized, paid, failed, refunded, cancelled, unknown }
+enum PaymentStatus { pending, processing, paid, failed, refunded, partiallyRefunded, unknown }
 
 class Payment {
   const Payment({
@@ -7,6 +7,10 @@ class Payment {
     required this.status,
     this.amount,
     this.method,
+    this.currency,
+    this.paymentType,
+    this.provider,
+    this.providerReference,
   });
 
   final String id;
@@ -14,16 +18,39 @@ class Payment {
   final PaymentStatus status;
   final num? amount;
   final String? method;
+  final String? currency;
+  final String? paymentType;
+  final String? provider;
+  final String? providerReference;
 
   factory Payment.fromMap(Map<String, dynamic> map) => Payment(
         id: map['id'].toString(),
         bookingId: map['booking_id'].toString(),
-        status: PaymentStatus.values.where((e) => e.name == (map['status'] as String? ?? '').toLowerCase()).firstOrNull ?? PaymentStatus.unknown,
+        status: _status(map['status']),
         amount: map['amount'] as num?,
-        method: map['payment_method'] as String?,
+        method: map['method']?.toString(),
+        currency: map['currency']?.toString(),
+        paymentType: map['payment_type']?.toString(),
+        provider: map['provider']?.toString(),
+        providerReference: map['provider_reference']?.toString(),
       );
-}
 
-extension<T> on Iterable<T> {
-  T? get firstOrNull => isEmpty ? null : first;
+  static PaymentStatus _status(Object? value) {
+    switch (value?.toString().toLowerCase()) {
+      case 'pending':
+        return PaymentStatus.pending;
+      case 'processing':
+        return PaymentStatus.processing;
+      case 'paid':
+        return PaymentStatus.paid;
+      case 'failed':
+        return PaymentStatus.failed;
+      case 'refunded':
+        return PaymentStatus.refunded;
+      case 'partially_refunded':
+        return PaymentStatus.partiallyRefunded;
+      default:
+        return PaymentStatus.unknown;
+    }
+  }
 }
