@@ -9,17 +9,23 @@ class HomeScreen extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        appBar: AppBar(title: const Text('تونس فيليج')),
+        appBar: AppBar(
+          title: const Text('تونس فيليج'),
+          actions: [
+            IconButton(
+              onPressed: () => context.push('/notifications'),
+              tooltip: 'الإشعارات',
+              icon: const Icon(Icons.notifications_none),
+            ),
+          ],
+        ),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'اكتشف إقامتك في قرية تونس',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
+                Text('اكتشف إقامتك في قرية تونس', style: Theme.of(context).textTheme.headlineSmall),
                 const SizedBox(height: 8),
                 const Text('ابحث عن الفيلا أو الوحدة المناسبة لتاريخ إقامتك.'),
                 const SizedBox(height: 24),
