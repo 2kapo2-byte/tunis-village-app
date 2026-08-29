@@ -6,7 +6,7 @@ class SearchQuery {
     required this.checkOut,
     required this.guests,
     this.text,
-  }) : assert(!checkOut.isBefore(checkIn));
+  }) : assert(checkOut.isAfter(checkIn));
 
   final DateTime checkIn;
   final DateTime checkOut;
