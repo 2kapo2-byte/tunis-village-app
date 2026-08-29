@@ -15,6 +15,7 @@ import '../../features/properties/presentation/properties_results_screen.dart';
 import '../../features/properties/presentation/property_details_screen.dart';
 import '../../features/availability/data/availability_repository.dart';
 import '../../features/booking/data/booking_repository.dart';
+import '../../features/booking/data/pricing_repository.dart';
 import '../../features/booking/domain/booking_result.dart';
 import '../../features/booking/domain/create_booking_request.dart';
 import '../../features/booking/presentation/customer_booking_review_screen.dart';
@@ -32,9 +33,7 @@ final appRouter = GoRouter(
     if (session != null && isPublic) return '/';
     return null;
   },
-  refreshListenable: GoRouterRefreshStream(
-    Supabase.instance.client.auth.onAuthStateChange,
-  ),
+  refreshListenable: GoRouterRefreshStream(Supabase.instance.client.auth.onAuthStateChange),
   routes: [
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
     GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
@@ -42,10 +41,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
     GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
     GoRoute(path: '/search', builder: (context, state) => const SearchScreen()),
-    GoRoute(
-      path: '/partner-search',
-      builder: (context, state) => const SearchScreen(partnerMode: true),
-    ),
+    GoRoute(path: '/partner-search', builder: (context, state) => const SearchScreen(partnerMode: true)),
     GoRoute(path: '/properties', builder: (context, state) {
       final extra = state.extra;
       final query = extra is SearchQuery
@@ -53,9 +49,7 @@ final appRouter = GoRouter(
           : extra is Map<String, dynamic>
               ? extra['query']
               : null;
-      final partnerMode = extra is Map<String, dynamic>
-          ? extra['partnerMode'] == true
-          : false;
+      final partnerMode = extra is Map<String, dynamic> ? extra['partnerMode'] == true : false;
       if (query is! SearchQuery) return const SearchScreen();
       return PropertiesResultsScreen(
         query: query,
@@ -69,9 +63,7 @@ final appRouter = GoRouter(
       final property = args['property'];
       final query = args['query'];
       final partnerMode = args['partnerMode'] == true;
-      if (property is! PropertySummary || query is! SearchQuery) {
-        return const SearchScreen();
-      }
+      if (property is! PropertySummary || query is! SearchQuery) return const SearchScreen();
       return PropertyDetailsScreen(
         property: property,
         query: query,
@@ -81,9 +73,7 @@ final appRouter = GoRouter(
     }),
     GoRoute(path: '/partner-booking-details', builder: (context, state) {
       final request = state.extra;
-      if (request is! CreateBookingRequest || !request.partnerMode) {
-        return const SearchScreen();
-      }
+      if (request is! CreateBookingRequest || !request.partnerMode) return const SearchScreen();
       return PartnerBookingDetailsScreen(request: request);
     }),
     GoRoute(path: '/booking-review', builder: (context, state) {
@@ -92,6 +82,7 @@ final appRouter = GoRouter(
       return CustomerBookingReviewScreen(
         request: request,
         repository: BookingRepository(Supabase.instance.client),
+        pricingRepository: PricingRepository(Supabase.instance.client),
       );
     }),
     GoRoute(path: '/booking-confirmation', builder: (context, state) {
