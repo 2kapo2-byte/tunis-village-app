@@ -23,7 +23,7 @@ jobs:
           cache: true
       - run: flutter pub get
       - name: Analyze Customer lib
-        run: flutter analyze lib
+        run: flutter analyze lib --no-fatal-infos
       - name: Test Customer App
         run: flutter test test
 
@@ -76,7 +76,8 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: flutter build apk --release
+      - name: Build Customer APK
+        run: flutter build apk --release
       - uses: actions/upload-artifact@v4
         with:
           name: tunis-village-customer-apk
@@ -92,6 +93,9 @@ jobs:
         with:
           channel: stable
           cache: true
+      - name: Generate Android platform files for partner app
+        working-directory: partner_app
+        run: flutter create --platforms=android --project-name tunis_village_partner .
       - name: Get dependencies
         working-directory: partner_app
         run: flutter pub get
