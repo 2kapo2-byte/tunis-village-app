@@ -65,7 +65,7 @@ class AvailabilityRepository {
       if (status == 'booked' || status == 'blocked' || status == 'external') blockedUnitIds.add(row['unit_id'].toString());
     }
 
-    final result = List.unmodifiable(eligibleUnits.where((row) => !blockedUnitIds.contains(row['id'].toString())).map((row) {
+    final result = List<AvailableUnit>.unmodifiable(eligibleUnits.where((row) => !blockedUnitIds.contains(row['id'].toString())).map((row) {
       final property = properties[row['property_id'].toString()]!;
       return AvailableUnit(id: row['id'].toString(), propertyId: row['property_id'].toString(), name: (row['name'] ?? 'وحدة').toString(), pricePerNight: (row['price_per_night'] as num?) ?? 0, capacity: (row['capacity'] as num?)?.toInt() ?? 0, propertyName: property['name']?.toString(), location: property['location']?.toString(), description: property['description']?.toString(), minStay: (property['min_stay'] as num?)?.toInt() ?? 1, maxStay: (property['max_stay'] as num?)?.toInt() ?? 0);
     }));
