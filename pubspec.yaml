@@ -15,6 +15,9 @@ dependencies:
   go_router: ^16.0.0
   supabase_flutter: ^2.9.0
   intl: ^0.20.2
+  connectivity_plus: ^6.1.4
+  shared_preferences: ^2.5.3
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
