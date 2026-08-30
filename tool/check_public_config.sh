@@ -18,9 +18,16 @@ while IFS= read -r -d '' file; do
   case "$file" in
     .env.example|*.md|*.png|*.jpg|*.jpeg|*.gif|*.webp|*.pdf|*.apk|*.aab|tool/check_public_config.sh) continue ;;
   esac
-  if grep -IEn '(SUPABASE_SERVICE_ROLE|service[_-]?role)[[:space:]]*[:=][[:space:]]*["'"']?[A-Za-z0-9._-]{20,}|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,}' "$file" >/dev/null 2>&1; then
-    echo "ERROR: possible privileged secret payload found in tracked file: $file"
-    grep -IEn '(SUPABASE_SERVICE_ROLE|service[_-]?role)[[:space:]]*[:=][[:space:]]*["'"']?[A-Za-z0-9._-]{20,}|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,}' "$file" || true
+
+  if grep -IEn "(SUPABASE_SERVICE_ROLE|service[_-]?role)[[:space:]]*[:=][[:space:]]*[^[:space:]\"']{20,}" "$file" >/dev/null 2>&1; then
+    echo "ERROR: possible privileged Supabase service-role payload found in tracked file: $file"
+    grep -IEn "(SUPABASE_SERVICE_ROLE|service[_-]?role)[[:space:]]*[:=][[:space:]]*[^[:space:]\"']{20,}" "$file" || true
+    fail=1
+  fi
+
+  if grep -IEn 'BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,}' "$file" >/dev/null 2>&1; then
+    echo "ERROR: possible private-key or GitHub token payload found in tracked file: $file"
+    grep -IEn 'BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,}' "$file" || true
     fail=1
   fi
 done < <(git ls-files -z)
