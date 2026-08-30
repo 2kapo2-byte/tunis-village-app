@@ -91,7 +91,10 @@ jobs:
       - name: Build Customer APK
         run: flutter build apk --release
       - name: Verify Customer APK
-        run: test -s build/app/outputs/flutter-apk/app-release.apk
+        run: |
+          test -s build/app/outputs/flutter-apk/app-release.apk
+          file build/app/outputs/flutter-apk/app-release.apk
+          sha256sum build/app/outputs/flutter-apk/app-release.apk
       - uses: actions/upload-artifact@v4
         with:
           name: tunis-village-customer-apk
@@ -117,7 +120,11 @@ jobs:
         working-directory: partner_app
         run: flutter build apk --release
       - name: Verify Partner APK
-        run: test -s partner_app/build/app/outputs/flutter-apk/app-release.apk
+        working-directory: partner_app
+        run: |
+          test -s build/app/outputs/flutter-apk/app-release.apk
+          file build/app/outputs/flutter-apk/app-release.apk
+          sha256sum build/app/outputs/flutter-apk/app-release.apk
       - uses: actions/upload-artifact@v4
         with:
           name: tunis-village-partner-apk
