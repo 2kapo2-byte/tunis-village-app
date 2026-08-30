@@ -5,12 +5,21 @@ class AnalyticsService {
 
   final SupabaseClient client;
 
+  static const allowedEvents = {
+    'search_started',
+    'search_completed',
+    'property_viewed',
+    'booking_started',
+    'booking_completed',
+    'booking_cancelled',
+  };
+
   Future<void> track(String event, {Map<String, Object?> properties = const {}}) async {
-    final userId = client.auth.currentUser?.id;
-    if (userId == null) return;
+    if (!allowedEvents.contains(event)) return;
+    if (client.auth.currentSession == null) return;
     try {
+      // Only coarse, non-sensitive event properties should be supplied by callers.
       await client.from('analytics_events').insert({
-        'user_id': userId,
         'event_name': event,
         'properties': properties,
       });
