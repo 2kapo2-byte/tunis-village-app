@@ -1,0 +1,8 @@
+name: tunis_village_core
+description: Shared domain contracts and models for Tunis Village mobile apps.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: '>=3.7.0 <4.0.0'
+
