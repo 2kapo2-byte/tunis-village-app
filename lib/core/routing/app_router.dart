@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/models/booking.dart';
+import '../../core/analytics/analytics_navigator_observer.dart';
 import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/profile_screen.dart';
@@ -35,6 +37,7 @@ import '../../core/support/support_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
+  observers: [AnalyticsNavigatorObserver(Supabase.instance.client)],
   redirect: (context, state) {
     final session = Supabase.instance.client.auth.currentSession;
     const publicPaths = {'/login', '/register', '/forgot-password'};
@@ -60,7 +63,7 @@ final appRouter = GoRouter(
       if (query is! SearchQuery) return const SearchScreen();
       return PropertiesResultsScreen(query: query, partnerMode: partnerMode, repository: AvailabilityRepository(Supabase.instance.client));
     }),
-    GoRoute(path: '/property-details', builder: (context, state) {
+    GoRoute(name: 'property-details', path: '/property-details', builder: (context, state) {
       final args = state.extra;
       if (args is! Map<String, dynamic>) return const SearchScreen();
       final property = args['property'];
