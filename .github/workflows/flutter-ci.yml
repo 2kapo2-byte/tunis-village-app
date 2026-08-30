@@ -75,9 +75,13 @@ jobs:
         with:
           channel: stable
           cache: true
+      - name: Generate Android platform files for customer app
+        run: flutter create --platforms=android --project-name tunis_village_customer .
       - run: flutter pub get
       - name: Build Customer APK
         run: flutter build apk --release
+      - name: Verify Customer APK
+        run: test -s build/app/outputs/flutter-apk/app-release.apk
       - uses: actions/upload-artifact@v4
         with:
           name: tunis-village-customer-apk
@@ -102,6 +106,8 @@ jobs:
       - name: Build Partner APK
         working-directory: partner_app
         run: flutter build apk --release
+      - name: Verify Partner APK
+        run: test -s partner_app/build/app/outputs/flutter-apk/app-release.apk
       - uses: actions/upload-artifact@v4
         with:
           name: tunis-village-partner-apk
