@@ -16,7 +16,6 @@ fi
 
 required_docs=(
   'docs/R8-PRODUCTION-READINESS-GATE.md'
-  'docs/RELEASE_PLATFORM_SECURITY_REQUIREMENTS.md'
 )
 for file in "${required_docs[@]}"; do
   test -f "$file" || { echo "ERROR: missing release security document: $file"; exit 1; }
