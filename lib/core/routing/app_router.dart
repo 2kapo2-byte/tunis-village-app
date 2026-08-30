@@ -31,6 +31,7 @@ import '../../features/reviews/data/review_repository.dart';
 import '../../features/reviews/presentation/create_review_screen.dart';
 import '../../features/notifications/data/notifications_repository.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
+import '../../core/support/support_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -51,6 +52,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
     GoRoute(path: '/search', builder: (context, state) => const SearchScreen()),
     GoRoute(path: '/partner-search', builder: (context, state) => const SearchScreen(partnerMode: true)),
+    GoRoute(path: '/support', builder: (context, state) => const SupportScreen()),
     GoRoute(path: '/properties', builder: (context, state) {
       final extra = state.extra;
       final query = extra is SearchQuery ? extra : extra is Map<String, dynamic> ? extra['query'] : null;
