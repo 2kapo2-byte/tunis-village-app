@@ -6,7 +6,7 @@ class SearchQuery {
     required this.checkOut,
     required this.guests,
     this.text,
-  }) : assert(checkOut.isAfter(checkIn));
+  });
 
   final DateTime checkIn;
   final DateTime checkOut;
@@ -14,6 +14,8 @@ class SearchQuery {
   final String? text;
 
   int get nights => checkOut.difference(checkIn).inDays;
+
+  bool get hasValidDateRange => checkOut.isAfter(checkIn);
 
   SearchQuery copyWith({
     DateTime? checkIn,
