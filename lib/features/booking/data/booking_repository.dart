@@ -22,13 +22,6 @@ class BookingRepository {
 
   Future<BookingResult> createBookingFromRequest(CreateBookingRequest request) => createBooking(unitId: request.unitId, propertyId: request.propertyId, checkIn: request.checkIn, checkOut: request.checkOut, guests: GuestComposition(adults: request.adults, childAges: request.childAges), paymentMethod: request.paymentMethod, customerNotes: request.customerNotes);
 
-  Future<BookingResult> createPartnerBooking({required String unitId, required String propertyId, required DateTime checkIn, required DateTime checkOut, required GuestComposition guests, required String guestFullName, required String guestPhone, String? guestEmail, String? paymentMethod, String? customerNotes}) async {
-    final data = await _client.rpc('create_partner_booking', params: {
-      'p_params': {'unit_id': unitId, 'property_id': propertyId, 'check_in': _date(checkIn), 'check_out': _date(checkOut), 'adults': guests.adults, 'children_count': guests.childrenCount, 'child_ages': guests.childAges, 'guest_full_name': guestFullName.trim(), 'guest_phone': guestPhone.trim(), 'guest_email': guestEmail?.trim(), 'payment_method': paymentMethod, 'customer_notes': customerNotes},
-    });
-    return _bookingResult(data);
-  }
-
   Future<List<Booking>> myBookings() async {
     final user = _client.auth.currentUser;
     if (user == null) return const [];
