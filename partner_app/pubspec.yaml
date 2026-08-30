@@ -1,0 +1,19 @@
+name: tunis_village_partner
+description: Tunis Village partner mobile app for marketers and property owners.
+publish_to: none
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.7.0 <4.0.0'
+
+# The final Flutter workspace wiring is completed after the shared-core
+# extraction is consumed by both applications.
+dependencies:
+  flutter:
+    sdk: flutter
+  tunis_village_core:
+    path: ../packages/tunis_village_core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
