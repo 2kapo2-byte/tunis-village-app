@@ -20,6 +20,15 @@ jobs:
       - name: Verify public configuration and secret hygiene
         run: bash tool/check_public_config.sh
 
+  release-signing-preflight:
+    name: Release Signing Security Preflight
+    runs-on: ubuntu-latest
+    needs: [config-security]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify signing material is not committed
+        run: bash tool/check_release_signing_preflight.sh
+
   customer-app:
     name: Customer App - Analyze & Test
     runs-on: ubuntu-latest
