@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/analytics/analytics_service.dart';
+import '../../../core/services/supabase_service.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -16,6 +18,11 @@ class HomeScreen extends StatelessWidget {
               onPressed: () => context.push('/notifications'),
               tooltip: 'الإشعارات',
               icon: const Icon(Icons.notifications_none),
+            ),
+            IconButton(
+              onPressed: () => context.push('/support'),
+              tooltip: 'المساعدة والدعم',
+              icon: const Icon(Icons.help_outline),
             ),
           ],
         ),
@@ -38,7 +45,10 @@ class HomeScreen extends StatelessWidget {
                         const Text('ابدأ البحث'),
                         const SizedBox(height: 14),
                         FilledButton.icon(
-                          onPressed: () => context.push('/search'),
+                          onPressed: () {
+                            const AnalyticsService(SupabaseService.client).track('search_started');
+                            context.push('/search');
+                          },
                           icon: const Icon(Icons.search),
                           label: const Text('البحث عن وحدات متاحة'),
                         ),
