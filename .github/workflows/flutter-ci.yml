@@ -114,3 +114,31 @@ jobs:
         with:
           name: tunis-village-partner-apk
           path: partner_app/build/app/outputs/flutter-apk/app-release.apk
+
+  ios-platform-validation:
+    name: iOS Platform Validation
+    runs-on: macos-latest
+    needs: [customer-app, partner-app, shared-core]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate Customer iOS platform
+        run: flutter create --platforms=ios --project-name tunis_village_customer .
+      - name: Set Customer bundle identifier
+        run: |
+          find ios -name project.pbxproj -print0 | xargs -0 sed -i '' 's/com.example.tunisVillage/com.tunisvillage.customer/g; s/com.example.tunis_village_customer/com.tunisvillage.customer/g'
+      - name: Validate Customer iOS build without signing
+        run: flutter build ios --release --no-codesign
+      - name: Generate Partner iOS platform
+        working-directory: partner_app
+        run: flutter create --platforms=ios --project-name tunis_village_partner .
+      - name: Set Partner bundle identifier
+        working-directory: partner_app
+        run: |
+          find ios -name project.pbxproj -print0 | xargs -0 sed -i '' 's/com.example.tunisVillage/com.tunisvillage.partner/g; s/com.example.tunis_village_partner/com.tunisvillage.partner/g'
+      - name: Validate Partner iOS build without signing
+        working-directory: partner_app
+        run: flutter build ios --release --no-codesign
