@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/network/network_banner.dart';
 import '../core/routing/app_router.dart';
 import '../core/theme/app_theme.dart';
 
@@ -8,11 +9,13 @@ class TunisVillageApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Tunis Village',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      routerConfig: appRouter,
+    return NetworkBanner(
+      child: MaterialApp.router(
+        title: 'Tunis Village',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        routerConfig: appRouter,
+      ),
     );
   }
 }
