@@ -15,112 +15,69 @@ jobs:
   customer-app:
     name: Customer App - Analyze & Test
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-
-      - name: Flutter version
-        run: flutter --version
-
-      - name: Get dependencies
-        run: flutter pub get
-
-      - name: Analyze
-        run: flutter analyze
-
-      - name: Test
-        run: flutter test
+      - run: flutter pub get
+      - name: Analyze Customer lib
+        run: flutter analyze lib
+      - name: Test Customer App
+        run: flutter test test
 
   partner-app:
     name: Partner App - Analyze & Test
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-
-      - name: Flutter version
-        run: flutter --version
-
       - name: Get dependencies
         working-directory: partner_app
         run: flutter pub get
-
-      - name: Analyze
+      - name: Analyze Partner App
         working-directory: partner_app
         run: flutter analyze
-
-      - name: Test
+      - name: Test Partner App
         working-directory: partner_app
         run: flutter test
 
   shared-core:
     name: Shared Core - Analyze & Test
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-
-      - name: Flutter version
-        run: flutter --version
-
       - name: Get dependencies
         working-directory: packages/tunis_village_core
-        run: flutter pub get
-
-      - name: Analyze
+        run: dart pub get
+      - name: Analyze Shared Core
         working-directory: packages/tunis_village_core
-        run: flutter analyze
-
-      - name: Test
+        run: dart analyze
+      - name: Test Shared Core
         working-directory: packages/tunis_village_core
-        run: flutter test
+        run: dart test
 
   customer-release:
     name: Customer Android Release Build
     runs-on: ubuntu-latest
-    needs:
-      - customer-app
-      - shared-core
-
+    needs: [customer-app, shared-core]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-
-      - name: Get dependencies
-        run: flutter pub get
-
-      - name: Build APK
-        run: flutter build apk --release
-
-      - name: Upload Customer APK
-        uses: actions/upload-artifact@v4
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
         with:
           name: tunis-village-customer-apk
           path: build/app/outputs/flutter-apk/app-release.apk
@@ -128,30 +85,20 @@ jobs:
   partner-release:
     name: Partner Android Release Build
     runs-on: ubuntu-latest
-    needs:
-      - partner-app
-      - shared-core
-
+    needs: [partner-app, shared-core]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-
       - name: Get dependencies
         working-directory: partner_app
         run: flutter pub get
-
-      - name: Build APK
+      - name: Build Partner APK
         working-directory: partner_app
         run: flutter build apk --release
-
-      - name: Upload Partner APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: tunis-village-partner-apk
           path: partner_app/build/app/outputs/flutter-apk/app-release.apk
