@@ -14,16 +14,8 @@ class HomeScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text('تونس فيليج'),
           actions: [
-            IconButton(
-              onPressed: () => context.push('/notifications'),
-              tooltip: 'الإشعارات',
-              icon: const Icon(Icons.notifications_none),
-            ),
-            IconButton(
-              onPressed: () => context.push('/support'),
-              tooltip: 'المساعدة والدعم',
-              icon: const Icon(Icons.help_outline),
-            ),
+            IconButton(onPressed: () => context.push('/notifications'), tooltip: 'الإشعارات', icon: const Icon(Icons.notifications_none)),
+            IconButton(onPressed: () => context.push('/support'), tooltip: 'المساعدة والدعم', icon: const Icon(Icons.help_outline)),
           ],
         ),
         body: SafeArea(
@@ -46,7 +38,7 @@ class HomeScreen extends StatelessWidget {
                         const SizedBox(height: 14),
                         FilledButton.icon(
                           onPressed: () {
-                            const AnalyticsService(SupabaseService.client).track('search_started');
+                            AnalyticsService(SupabaseService.client).track('search_started');
                             context.push('/search');
                           },
                           icon: const Icon(Icons.search),
