@@ -75,7 +75,9 @@ jobs:
         with:
           channel: stable
           cache: true
-      - name: Generate Android platform files for customer app
+      - name: Remove incomplete legacy Android platform
+        run: rm -rf android
+      - name: Generate clean Android platform
         run: flutter create --platforms=android --project-name tunis_village_customer .
       - run: flutter pub get
       - name: Build Customer APK
@@ -97,7 +99,7 @@ jobs:
         with:
           channel: stable
           cache: true
-      - name: Generate Android platform files for partner app
+      - name: Generate clean Android platform
         working-directory: partner_app
         run: flutter create --platforms=android --project-name tunis_village_partner .
       - name: Get dependencies
