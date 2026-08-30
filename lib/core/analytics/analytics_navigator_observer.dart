@@ -20,12 +20,6 @@ class AnalyticsNavigatorObserver extends NavigatorObserver {
   }
 
   void _track(Route<dynamic> route) {
-    final event = switch (route.settings.name) {
-      'property-details' => 'property_viewed',
-      'booking-review' => 'booking_started',
-      'booking-confirmation' => 'booking_completed',
-      _ => null,
-    };
-    if (event != null) AnalyticsService(_client).track(event);
+    if (route.settings.name == 'property-details') AnalyticsService(_client).track('property_viewed');
   }
 }
